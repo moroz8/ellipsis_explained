@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ellipses & Space Orbits</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="star-bg"></div>
+
+    <header>
+        <div class="badge">A Space Geometry Lesson</div>
+        <h1>The Magic of <span>Ellipses</span></h1>
+        <p>A journey from simple shapes to the orbits of worlds.</p>
+    </header>
+
+    <main>
+        <!-- Section 1: The Basics -->
+        <section class="glass-panel" id="section-intro">
+            <h2>1. What is an Ellipse?</h2>
+            <p>Imagine a circle that someone sat on. That's an ellipse! But there is a very special math rule it follows.</p>
+            <p>Instead of one center point (like a circle), an ellipse has two special spots called <strong>Foci</strong> (plural for Focus).</p>
+            
+            <div class="interactive-container">
+                <canvas id="canvasString" width="800" height="400"></canvas>
+                <div class="overlay-controls">
+                    <p class="math-display">Distance 1 <span class="d1-color">(--)</span> + Distance 2 <span class="d2-color">(--)</span> = <strong class="total-color">--</strong></p>
+                    <p class="hint-text">Move your mouse to drag the glowing dot around the edge!</p>
+                </div>
+            </div>
+            <p class="explanation">
+                <strong>The String Trick:</strong> If you pin a string at both foci and trace around it with a pencil, you'll draw a perfect ellipse. Look closely—the total length of the string NEVER changes!
+            </p>
+        </section>
+
+        <!-- Section 2: Space Orbits -->
+        <section class="glass-panel" id="section-orbits">
+            <h2>2. Gravity and Space Orbits</h2>
+            <p>Johannes Kepler discovered a massive secret about our universe: Planets don't orbit in perfect circles. They orbit in ellipses!</p>
+            <p>And here's the best part: The Sun isn't in the center. The Sun sits exactly on <strong>one of the foci</strong>. The other focus is just empty space.</p>
+            
+            <div class="interactive-container">
+                <canvas id="canvasOrbit" width="800" height="400"></canvas>
+                <div class="orbit-controls">
+                    <label for="eccentricity">Squash the Orbit (Eccentricity): <span id="eccVal">0.50</span></label>
+                    <input type="range" id="eccentricity" min="0" max="0.85" step="0.01" value="0.5">
+                    <div class="orbit-labels">
+                        <span>Circle-like (Earth)</span>
+                        <span>Stretched Orbit (Comet)</span>
+                    </div>
+                </div>
+            </div>
+            <p class="explanation">
+                <strong>Kepler's Second Law:</strong> Watch how the planet suddenly speeds up when it gets close to the Sun, and slows down when it's far away. That's gravity pulling it in!
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>Created for curious minds exploring the universe. 🚀</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
