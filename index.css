@@ -142,6 +142,7 @@ canvas {
     height: auto;
     display: block;
     cursor: grab;
+    touch-action: none;
 }
 canvas:active {
     cursor: grabbing;
@@ -251,4 +252,44 @@ footer {
         padding: 1rem;
         width: 100%;
     }
+}
+
+.stats-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+.stats-row strong {
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.sliders-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    width: 100%;
+    margin-top: 1rem;
+    justify-content: center;
+}
+.slider-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    min-width: 160px;
+}
+.slider-group label {
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+    color: var(--text-muted);
+}
+.slider-group label span {
+    color: var(--text-main);
+    font-weight: 600;
 }

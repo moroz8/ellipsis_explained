@@ -24,10 +24,24 @@
             <p>Instead of one center point (like a circle), an ellipse has two special spots called <strong>Foci</strong> (plural for Focus).</p>
             
             <div class="interactive-container">
-                <canvas id="canvasString" width="800" height="400"></canvas>
+                <canvas id="canvasString" width="800" height="600"></canvas>
                 <div class="overlay-controls">
-                    <p class="math-display">Distance 1 <span class="d1-color">(--)</span> + Distance 2 <span class="d2-color">(--)</span> = <strong class="total-color">--</strong></p>
-                    <p class="hint-text">Move your mouse to drag the glowing dot around the edge!</p>
+                    <p class="math-display" style="margin-bottom: 0.5rem !important;">Distance 1 <span class="d1-color">(--)</span> + Distance 2 <span class="d2-color">(--)</span> = <strong class="total-color">--</strong></p>
+                    <div class="sliders-row">
+                        <div class="slider-group">
+                            <label>Major Axis (a): <span id="valA">--</span></label>
+                            <input type="range" id="sliderA" min="150" max="380" step="1" value="280">
+                        </div>
+                        <div class="slider-group">
+                            <label>Minor Axis (b): <span id="valB">--</span></label>
+                            <input type="range" id="sliderB" min="0" max="380" step="1" value="160">
+                        </div>
+                        <div class="slider-group">
+                            <label>Foci Dist (c): <span id="valC">--</span></label>
+                            <input type="range" id="sliderC" min="0" max="380" step="1" value="229">
+                        </div>
+                    </div>
+                    <p class="hint-text">Move your mouse to drag the point, or play with the geometry sliders!</p>
                 </div>
             </div>
             <p class="explanation">
@@ -46,9 +60,18 @@
                 <div class="orbit-controls">
                     <label for="eccentricity">Squash the Orbit (Eccentricity): <span id="eccVal">0.50</span></label>
                     <input type="range" id="eccentricity" min="0" max="0.85" step="0.01" value="0.5">
+                    
+                    <label for="orbitScale" style="margin-top: 1.5rem;">Scale Orbit (Major Semi Axis): <span id="orbitScaleVal">50.0</span></label>
+                    <input type="range" id="orbitScale" min="80" max="380" step="1" value="170">
                     <div class="orbit-labels">
                         <span>Circle-like (Earth)</span>
                         <span>Stretched Orbit (Comet)</span>
+                    </div>
+                    <div class="stats-row">
+                        <span>Perihelion (Closest): <strong id="periVal">--</strong></span>
+                        <span>Aphelion (Farthest): <strong id="aphVal">--</strong></span>
+                        <span>Major Semi Axis: <strong id="majorVal2">--</strong></span>
+                        <span>Minor Semi Axis: <strong id="minorVal">--</strong></span>
                     </div>
                 </div>
             </div>

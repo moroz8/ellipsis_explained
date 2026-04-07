@@ -34,19 +34,56 @@ function initCanvasString() {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     
-    // Define ellipse geometry
-    const cx = canvas.width / 2;
-    const cy = canvas.height / 2 + 20; // shifted slightly down for UI space
-    const a = 280; // semi-major axis (width)
-    const b = 160;   // semi-minor axis (height)
-    const c = Math.sqrt(a*a - b*b); // focus distance from center
+    const sliderA = document.getElementById("sliderA");
+    const sliderB = document.getElementById("sliderB");
+    const sliderC = document.getElementById("sliderC");
     
-    // Foci positions
-    const f1 = { x: cx - c, y: cy };
-    const f2 = { x: cx + c, y: cy };
+    // UI Value placeholders
+    const valA = document.getElementById("valA");
+    const valB = document.getElementById("valB");
+    const valC = document.getElementById("valC");
 
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2; 
+    
+    // Initial geometric state
+    let a = parseFloat(sliderA.value); 
+    let b = parseFloat(sliderB.value);   
+    let c = Math.sqrt(a*a - b*b); 
+    sliderC.value = c; // ensure synced initially
+
+    const uiScale = 50 / 280; // Keep the '50.0' visual scale paradigm
+
+    function updateC_from_ab() {
+        if (b > a) { b = a; sliderB.value = b; }
+        c = Math.sqrt(a*a - b*b);
+        sliderC.value = c;
+    }
+
+    function updateB_from_ac() {
+        if (c > a) { c = a; sliderC.value = c; }
+        b = Math.sqrt(a*a - c*c);
+        sliderB.value = b;
+    }
+
+    sliderA.addEventListener('input', (e) => {
+        a = parseFloat(e.target.value);
+        sliderB.max = a; sliderC.max = a;
+        updateC_from_ab(); draw();
+    });
+
+    sliderB.addEventListener('input', (e) => {
+        b = parseFloat(e.target.value);
+        updateC_from_ab(); draw();
+    });
+
+    sliderC.addEventListener('input', (e) => {
+        c = parseFloat(e.target.value);
+        updateB_from_ac(); draw();
+    });
+    
     let isInteracting = false;
-    let pointAngle = -Math.PI / 4; // Start at a nice initial angle
+    let pointAngle = -Math.PI / 4; 
 
     function getEllipsePoint(angle) {
         return {
@@ -64,13 +101,17 @@ function initCanvasString() {
 
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        let currentPoint = getEllipsePoint(pointAngle);
+        const f1 = { x: cx - c, y: cy };
+        const f2 = { x: cx + c, y: cy };
 
         // 1. Draw Ellipse Path (Dashed)
         ctx.beginPath();
         ctx.ellipse(cx, cy, a, b, 0, 0, 2 * Math.PI);
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
-        ctx.setLineDash([5, 8]);
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.setLineDash([8, 12]);
+        ctx.lineWidth = 3;
         ctx.stroke();
         ctx.setLineDash([]);
 
@@ -79,8 +120,8 @@ function initCanvasString() {
         ctx.shadowColor = "#fb923c";
         ctx.shadowBlur = 10;
         
-        ctx.beginPath(); ctx.arc(f1.x, f1.y, 6, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.arc(f2.x, f2.y, 6, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(f1.x, f1.y, 8, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(f2.x, f2.y, 8, 0, Math.PI*2); ctx.fill();
         ctx.shadowBlur = 0; // Reset
 
         // 3. Draw Lines from Foci to Point
@@ -104,27 +145,30 @@ function initCanvasString() {
         ctx.shadowColor = "#ffffff";
         ctx.shadowBlur = 15;
         ctx.beginPath();
-        ctx.arc(currentPoint.x, currentPoint.y, 10, 0, Math.PI*2);
+        ctx.arc(currentPoint.x, currentPoint.y, 16, 0, Math.PI*2);
         ctx.fill();
         ctx.shadowBlur = 0;
 
         // Draw smaller inner ring on the point
         ctx.fillStyle = "#0f172a";
-        ctx.beginPath(); ctx.arc(currentPoint.x, currentPoint.y, 4, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(currentPoint.x, currentPoint.y, 6, 0, Math.PI*2); ctx.fill();
 
         // 5. Update HTML UI Distances
         const d1 = Math.hypot(currentPoint.x - f1.x, currentPoint.y - f1.y);
         const d2 = Math.hypot(currentPoint.x - f2.x, currentPoint.y - f2.y);
         
-        // Scale to an arbitrary nice unit (e.g. Total = 100)
-        const scale = 100 / (a * 2); 
-        const d1Scaled = (d1 * scale).toFixed(1);
-        const d2Scaled = (d2 * scale).toFixed(1);
-        const totalScaled = (d1 * scale + d2 * scale).toFixed(1);
+        const d1Scaled = (d1 * uiScale).toFixed(1);
+        const d2Scaled = (d2 * uiScale).toFixed(1);
+        const totalScaled = (d1 * uiScale + d2 * uiScale).toFixed(1);
 
         if(d1Color) d1Color.textContent = d1Scaled;
         if(d2Color) d2Color.textContent = d2Scaled;
         if(totalColor) totalColor.textContent = totalScaled;
+
+        // Update Slider Labels
+        if(valA) valA.textContent = (a * uiScale).toFixed(1);
+        if(valB) valB.textContent = (b * uiScale).toFixed(1);
+        if(valC) valC.textContent = (c * uiScale).toFixed(1);
     }
 
     // Interaction handler
@@ -132,15 +176,14 @@ function initCanvasString() {
         if (!isInteracting && e.type.includes('touch')) return; 
         
         const pos = getMousePos(canvas, e);
-        // Find angle logic relative to center
         pointAngle = Math.atan2(pos.y - cy, pos.x - cx);
-        currentPoint = getEllipsePoint(pointAngle);
         draw();
     }
 
     // Add Events
     canvas.addEventListener('mousemove', handleMove);
     canvas.addEventListener('touchmove', (e) => { e.preventDefault(); handleMove(e); }, { passive: false });
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleMove(e); }, { passive: false });
     
     // Initial paint
     draw();
@@ -156,13 +199,20 @@ function initCanvasOrbit() {
     
     const slider = document.getElementById("eccentricity");
     const eccValText = document.getElementById("eccVal");
+    const scaleSlider = document.getElementById("orbitScale");
+    const scaleValText = document.getElementById("orbitScaleVal");
 
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
-    const a = 260; // semi-major axis
+    let a = 170; // initial semi-major axis
 
-    let e = parseFloat(slider.value); // eccentricity
-    let planetAngle = 0; // True anomaly roughly
+    let e = parseFloat(slider.value); 
+    if(scaleSlider) {
+        a = parseFloat(scaleSlider.value);
+    }
+    let planetAngle = 0; 
+
+    const uiScale = 50 / 170; // fixed visual units mapping
 
     function drawSystem() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -171,6 +221,21 @@ function initCanvasOrbit() {
         const c = a * e; 
         const b = a * Math.sqrt(1 - e*e); 
 
+        // Update HTML Stats
+        const displayA = a * uiScale;
+        const displayC = c * uiScale;
+        const displayB = b * uiScale;
+        
+        const periVal = document.getElementById('periVal');
+        const aphVal = document.getElementById('aphVal');
+        const majorVal2 = document.getElementById('majorVal2');
+        const minorVal = document.getElementById('minorVal');
+        
+        if (periVal) periVal.textContent = (displayA - displayC).toFixed(1);
+        if (aphVal) aphVal.textContent = (displayA + displayC).toFixed(1);
+        if (majorVal2) majorVal2.textContent = displayA.toFixed(1);
+        if (minorVal) minorVal.textContent = displayB.toFixed(1);
+
         // Sun sits at Focus 1 
         const sunX = cx - c;
         const sunY = cy;
@@ -178,8 +243,8 @@ function initCanvasOrbit() {
         // 1. Draw Orbit Path
         ctx.beginPath();
         ctx.ellipse(cx, cy, a, b, 0, 0, 2 * Math.PI);
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+        ctx.lineWidth = 3;
         ctx.stroke();
 
         // 2. Draw Center + Empty Focus subtly
@@ -244,6 +309,12 @@ function initCanvasOrbit() {
         slider.addEventListener('input', (evt) => {
             e = parseFloat(evt.target.value);
             if(eccValText) eccValText.textContent = e.toFixed(2);
+        });
+    }
+    if(scaleSlider) {
+        scaleSlider.addEventListener('input', (evt) => {
+            a = parseFloat(evt.target.value);
+            if(scaleValText) scaleValText.textContent = (a * uiScale).toFixed(1);
         });
     }
 
